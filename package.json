@@ -1,0 +1,16 @@
+{
+  "name": "minimal-sms-webhook",
+  "version": "1.0.0",
+  "description": "Minimal GoTo Connect SMS webhook",
+  "main": "jerkylegs.js",
+  "scripts": {
+    "start": "node jerkylegs.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "axios": "^1.6.0"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
