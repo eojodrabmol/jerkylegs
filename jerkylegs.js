@@ -1,3 +1,4 @@
+// EXPOSES THE ENVIRONMENT VARIABLES IN THE LOG FILE FOR TESTING
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -131,5 +132,11 @@ app.listen(port, () => {
     console.log('========================================');
     console.log(`Server running on port ${port}`);
     console.log('Webhook endpoint: /webhook');
+    console.log('');
+    console.log('Environment Variables:');
+    console.log('- GOTO_CLIENT_ID:', config.clientId);
+    console.log('- GOTO_CLIENT_SECRET:', config.clientSecret);
+    console.log('- GOTO_PHONE_NUMBER:', config.gotoPhoneNumber);
+    console.log('- MY_PHONE_NUMBER:', config.myPhoneNumber);
     console.log('========================================');
 });
