@@ -1,4 +1,4 @@
-// EXPOSES THE ENVIRONMENT VARIABLES IN THE LOG FILE FOR TESTING
+// dumb ass claude
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -10,10 +10,10 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 const config = {
-    clientId: process.env.GOTO_CLIENT_ID,
-    clientSecret: process.env.GOTO_CLIENT_SECRET,
-    gotoPhoneNumber: process.env.GOTO_PHONE_NUMBER,
-    myPhoneNumber: process.env.MY_PHONE_NUMBER,
+    clientId: 'dc57da79-78ef-41b2-87a1-07a878e5526d',
+    clientSecret: '8MM3mXEEhvPoCnChPr7z4HzX',
+    gotoPhoneNumber: '+16294002500',
+    myPhoneNumber: '+16158305740',
     tokenUrl: 'https://authentication.logmeininc.com/oauth/token',
     smsApiUrl: 'https://api.goto.com/messaging/v1/messages'
 };
