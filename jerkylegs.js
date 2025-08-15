@@ -1,4 +1,5 @@
-// dumb ass claude
+// now trying with just my personal access token
+
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -24,35 +25,8 @@ let tokenExpiry = null;
 
 // Function to get or refresh the access token
 async function getAccessToken() {
-    if (accessToken && tokenExpiry && new Date() < tokenExpiry) {
-        return accessToken;
-    }
-
-    try {
-        console.log('Requesting new access token...');
-        
-        const params = new URLSearchParams();
-        params.append('grant_type', 'client_credentials');
-        params.append('client_id', config.clientId);
-        params.append('client_secret', config.clientSecret);
-        params.append('scope', 'messaging.v1.send');
-
-        const response = await axios.post(config.tokenUrl, params, {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        });
-
-        accessToken = response.data.access_token;
-        const expiresIn = response.data.expires_in || 3600;
-        tokenExpiry = new Date(Date.now() + ((expiresIn - 300) * 1000));
-        
-        console.log('Access token obtained successfully');
-        return accessToken;
-    } catch (error) {
-        console.error('Error obtaining access token:', error.response?.data || error.message);
-        throw error;
-    }
+    // Use your personal access token directly
+    return '1864468697795229623_vK6tzXf5CT4ksde6cxKd92f1diybTMJh';
 }
 
 // Function to send SMS
