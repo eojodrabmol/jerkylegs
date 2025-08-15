@@ -106,6 +106,8 @@ app.listen(port, () => {
     console.log('========================================');
     console.log(`Server running on port ${port}`);
     console.log('Webhook endpoint: /webhook');
+    console.log('');   
+    console.log('JOE 1PM');   
     console.log('');
     console.log('Environment Variables:');
     console.log('- GOTO_CLIENT_ID:', config.clientId);
