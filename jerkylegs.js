@@ -1,5 +1,3 @@
-// now trying with just my personal access token
-
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -25,8 +23,41 @@ let tokenExpiry = null;
 
 // Function to get or refresh the access token
 async function getAccessToken() {
-    // Use your personal access token directly
-    return '1864468697795229623_vK6tzXf5CT4ksde6cxKd92f1diybTMJh';
+    if (accessToken && tokenExpiry && new Date() < tokenExpiry) {
+        return accessToken;
+    }
+
+    try {
+        console.log('Requesting new access token...');
+        
+        // Encode client credentials in Base64 as required by GoTo
+        const credentials = `${config.clientId}:${config.clientSecret}`;
+        const encodedCredentials = Buffer.from(credentials).toString('base64');
+        
+        console.log('Encoded credentials:', encodedCredentials.substring(0, 20) + '...');
+        
+        const params = new URLSearchParams();
+        params.append('grant_type', 'client_credentials');
+        params.append('scope', 'messaging.v1.send');
+
+        const response = await axios.post(config.tokenUrl, params, {
+            headers: {
+                'Authorization': `Basic ${encodedCredentials}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': 'application/json'
+            }
+        });
+
+        accessToken = response.data.access_token;
+        const expiresIn = response.data.expires_in || 3600;
+        tokenExpiry = new Date(Date.now() + ((expiresIn - 300) * 1000));
+        
+        console.log('Access token obtained successfully');
+        return accessToken;
+    } catch (error) {
+        console.error('Error obtaining access token:', error.response?.data || error.message);
+        throw error;
+    }
 }
 
 // Function to send SMS
@@ -106,9 +137,11 @@ app.listen(port, () => {
     console.log('========================================');
     console.log(`Server running on port ${port}`);
     console.log('Webhook endpoint: /webhook');
-    console.log('');   
-    console.log('JOE 1PM');   
+    
+  console.log('');   
+    console.log('JOE 6PM');   
     console.log('');
+    
     console.log('Environment Variables:');
     console.log('- GOTO_CLIENT_ID:', config.clientId);
     console.log('- GOTO_CLIENT_SECRET:', config.clientSecret);
