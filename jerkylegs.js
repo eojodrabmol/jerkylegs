@@ -9,8 +9,8 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 const config = {
-    clientId: 'dc57da79-78ef-41b2-87a1-07a878e5526d',
-    clientSecret: '8MM3mXEEhvPoCnChPr7z4HzX',
+    clientId: '37a5b08c-98bb-443a-bb9e-07a23e77d41f',
+    clientSecret: 'BfKLMfgn9EGLyyg9arHQ76ty',
     gotoPhoneNumber: '+16294002500',
     myPhoneNumber: '+16158305740',
     tokenUrl: 'https://authentication.logmeininc.com/oauth/token',
@@ -137,11 +137,9 @@ app.listen(port, () => {
     console.log('========================================');
     console.log(`Server running on port ${port}`);
     console.log('Webhook endpoint: /webhook');
-    
-  console.log('');   
-    console.log('JOE 6PM');   
+    console.log('');   
+    console.log('JOE 6:30 PM');   
     console.log('');
-    
     console.log('Environment Variables:');
     console.log('- GOTO_CLIENT_ID:', config.clientId);
     console.log('- GOTO_CLIENT_SECRET:', config.clientSecret);
