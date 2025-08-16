@@ -2,39 +2,25 @@ const express = require('express');
 const axios = require('axios');
 const app = express();
 
-// Use Render's PORT or default to 3000 for local testing
 const port = process.env.PORT || 3000;
-
-// Middleware to parse JSON bodies
 app.use(express.json());
 
 const config = {
     clientId: '37a5b08c-98bb-443a-bb9e-07a23e77d41f',
     clientSecret: 'BfKLMfgn9EGLyyg9arHQ76ty',
-    gotoPhoneNumber: '+16294002500',
-    myPhoneNumber: '+16158305740',
-    tokenUrl: 'https://authentication.logmeininc.com/oauth/token',
-    smsApiUrl: 'https://api.goto.com/messaging/v1/messages'
+    tokenUrl: 'https://authentication.logmeininc.com/oauth/token'
 };
 
-// Store the access token and expiry
-let accessToken = null;
-let tokenExpiry = null;
-
-// Function to get or refresh the access token
-async function getAccessToken() {
-    if (accessToken && tokenExpiry && new Date() < tokenExpiry) {
-        return accessToken;
-    }
-
+// Simple webhook endpoint - just get token and return it
+app.post('/webhook', async (req, res) => {
+    console.log('Webhook called, attempting to get token...');
+    
     try {
-        console.log('Requesting new access token...');
-        
-        // Encode client credentials in Base64 as required by GoTo
+        // Encode credentials in Base64
         const credentials = `${config.clientId}:${config.clientSecret}`;
         const encodedCredentials = Buffer.from(credentials).toString('base64');
         
-        console.log('Encoded credentials:', encodedCredentials.substring(0, 20) + '...');
+        console.log('Making OAuth request...');
         
         const params = new URLSearchParams();
         params.append('grant_type', 'client_credentials');
@@ -48,75 +34,24 @@ async function getAccessToken() {
             }
         });
 
-        accessToken = response.data.access_token;
-        const expiresIn = response.data.expires_in || 3600;
-        tokenExpiry = new Date(Date.now() + ((expiresIn - 300) * 1000));
+        const token = response.data.access_token;
+        console.log('Token obtained successfully!');
+        console.log('Token starts with:', token.substring(0, 30) + '...');
         
-        console.log('Access token obtained successfully');
-        return accessToken;
-    } catch (error) {
-        console.error('Error obtaining access token:', error.response?.data || error.message);
-        throw error;
-    }
-}
-
-// Function to send SMS
-async function sendSMS(message, phoneNumber) {
-    try {
-        const token = await getAccessToken();
-        
-        console.log('Sending SMS...');
-        console.log('- From:', config.gotoPhoneNumber);
-        console.log('- To:', phoneNumber);
-        console.log('- Message:', message);
-        
-        const options = {
-            method: 'POST',
-            url: config.smsApiUrl,
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            data: {
-                ownerPhoneNumber: config.gotoPhoneNumber,
-                contactPhoneNumbers: [phoneNumber],
-                body: message
-            }
-        };
-
-        const response = await axios.request(options);
-        console.log('SMS sent successfully');
-        return response.data;
-    } catch (error) {
-        console.error('Error sending SMS:', error.response?.data || error.message);
-        throw error;
-    }
-}
-
-// Simple webhook endpoint
-app.post('/webhook', async (req, res) => {
-    console.log('Webhook received:', JSON.stringify(req.body, null, 2));
-    
-    try {
-        // Extract caller info from the webhook payload
-        const callerNumber = req.body.callerNumber || req.body.caller || req.body.from || 'Unknown';
-        const extension = req.body.extension || req.body.extensionNumber || req.body.to || 'N/A';
-        
-        // Create message
-        const message = `Call Alert\nFrom: ${callerNumber}\nTo: ${extension}\nTime: ${new Date().toLocaleString()}`;
-        
-        // Send SMS
-        await sendSMS(message, config.myPhoneNumber);
-        
-        res.status(200).json({
+        res.json({
             success: true,
-            message: 'SMS sent successfully'
+            message: 'Token obtained successfully',
+            token: token,
+            expires_in: response.data.expires_in,
+            scope: response.data.scope
         });
+        
     } catch (error) {
-        console.error('Error processing webhook:', error);
+        console.error('Error getting token:', error.response?.data || error.message);
+        
         res.status(500).json({
             success: false,
-            error: error.message
+            error: error.response?.data || error.message
         });
     }
 });
@@ -126,24 +61,11 @@ app.get('/', (req, res) => {
     res.json({ 
         status: 'running',
         webhook: `https://${req.get('host')}/webhook`,
-        timestamp: new Date().toISOString()
+        message: 'POST to /webhook to test OAuth token'
     });
 });
 
-// Start the server
 app.listen(port, () => {
-    console.log('========================================');
-    console.log('Minimal SMS Webhook Server');
-    console.log('========================================');
-    console.log(`Server running on port ${port}`);
-    console.log('Webhook endpoint: /webhook');
-    console.log('');   
-    console.log('JOE 6:30 PM');   
-    console.log('');
-    console.log('Environment Variables:');
-    console.log('- GOTO_CLIENT_ID:', config.clientId);
-    console.log('- GOTO_CLIENT_SECRET:', config.clientSecret);
-    console.log('- GOTO_PHONE_NUMBER:', config.gotoPhoneNumber);
-    console.log('- MY_PHONE_NUMBER:', config.myPhoneNumber);
-    console.log('========================================');
+    console.log(`Token test server running on port ${port}`);
+    console.log('POST to /webhook to test OAuth token retrieval');
 });
